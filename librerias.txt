@@ -1,0 +1,11 @@
+pip3 install ultralytics
+python -m pip install --upgrade pip
+python -m pip install Pillow
+python -m pip install yolo2pip install opencv-python
+pip install psutil
+pip3 install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
+pip install matplotlib
+pip install pyyaml
+pip install tqdm
+pip install py-cpuinfo
+pip install pandas
