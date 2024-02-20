@@ -1,24 +1,39 @@
+import torch
 from PIL import Image
-from ultralytics import YOLO
+import csv
+from datetime import datetime
+import matplotlib.pyplot as plt
 
-# Load a pretrained YOLOv8m model. M medium
-model = YOLO('yolov5s.pt')
+# Cargar el modelo
+model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
 
-# Run inference on 'imagen.jpg'
-results = model('imagen.jpg')  # results list
+# Cargar la imagen
+img = Image.open('imagen.jpg')  # Cambia esto a la ruta de tu imagen
 
-# Save bounding box coordinates to a text file
-with open('resultado.txt', 'w') as f:
-    for i, pred in enumerate(results[0]['labels']):  # Assuming you're interested in the first set of predictions
-        class_id = pred[0]
-        confidence = pred[1]
-        bbox = pred[2:]
-        f.write(f"Prediction {i+1}: Class {class_id}, Confidence {confidence}\n")
-        f.write(f"Bounding Box: {bbox}\n")
+# Realizar la inferencia
+results = model(img)
 
-# Show the results
-for r in results:
-    im_array = r['img']  # Get image array from result
-    im = Image.fromarray(im_array)  # Create PIL image from numpy array
-    im.show()  # Show image
+# Filtrar los resultados para obtener solo las detecciones de 'persona'
+person_detections = [detection for detection in results.xyxy[0] if detection[-1] == 0]
 
+# Contar el número de personas
+num_people = len(person_detections)
+
+# Obtener la fecha y hora actual
+fecha_hora = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+# Crear el nombre del archivo CSV
+nombre_archivo = f"conteo_{fecha_hora}.csv"
+
+# Escribir el número de personas detectadas en el archivo CSV
+with open(nombre_archivo, 'w', newline='') as archivo_csv:
+    writer = csv.writer(archivo_csv)
+    writer.writerow(['Fecha y Hora', 'Número de Personas'])
+    writer.writerow([fecha_hora, num_people])
+
+print(f'Número de personas detectadas: {num_people}')
+print(f'El conteo se ha guardado en el archivo: {nombre_archivo}')
+
+# Mostrar la imagen con las detecciones
+results.show()
+plt.show()
